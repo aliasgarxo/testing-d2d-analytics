@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campaign-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: campaign-controller
+  template:
+    metadata:
+      labels:
+        app: campaign-controller
+    spec:
+      containers:
+      - name: campaign-controller
+        image: dellhoak/campaign-controller:latest
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: campaign-controller-service
+spec:
+  selector:
+    app: campaign-controller
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+
