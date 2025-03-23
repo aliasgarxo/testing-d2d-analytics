@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: twitter-scraper-job
+spec:
+  schedule: "0 0 * * *"  # Runs daily at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: twitter-scraper
+            image: dellhoak/twitter-scraper:latest
+            envFrom:
+              - configMapRef:
+                  name: twitter-config
+              - secretRef:
+                  name: twitter-secrets
+            env:
+              - name: DB_HOST
+                value: "postgres-service"
+              - name: DB_PORT
+                value: "5432"
+              - name: DB_NAME
+                value: "tweetsdb"
+              - name: DB_USER
+                value: "postgres"
+              - name: DB_PASSWORD
+                value: "postgres"
+            volumeMounts:
+              - name: data-volume
+                mountPath: /data
+          restartPolicy: OnFailure
+          volumes:
+            - name: data-volume
+              persistentVolumeClaim:
+                claimName: twitter-data-pvc

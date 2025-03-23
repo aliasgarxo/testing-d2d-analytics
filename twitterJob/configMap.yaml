@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: twitter-config
+data:
+  TWITTER_API_KEY: "kV0QMlWXsUKt9xzdwYY2K6AAu"
+  TWITTER_API_SECRET: "9dlYIy7zqxoiwsLO1KIPRjGzCJJOoK9y5LOjWR0gHHtlofTn1K"
+  TWITTER_ACCESS_TOKEN: "4887672444-1XKfIkcI2Pehx99t7aCw1GAii2G3kv3T2iDZOtj"
+  TWITTER_ACCESS_SECRET: "FaQ3E59AGDd5EDLGq5husaxgMc3nkAbmsVmxn3on4urHc"
+

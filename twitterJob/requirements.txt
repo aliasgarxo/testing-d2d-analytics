@@ -1,0 +1,6 @@
+tweepy
+pandas
+psycopg2-binary
+sqlalchemy
+openpyxl
+
