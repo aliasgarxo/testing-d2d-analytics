@@ -1,0 +1,10 @@
+{
+    "name": "test-twitter-campaign",
+    "schedule": "0 10 * * *",
+    "target_api_url": "http://main-service/analyze_twitter",
+    "payload": {
+      "twitter_accounts": "liberal_party",
+      "language": "en"
+    }
+  }
+

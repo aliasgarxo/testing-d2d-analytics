@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from kubernetes import client, config
+import base64
+import json
 import uuid
 
 app = FastAPI()
@@ -16,10 +18,15 @@ batch_v1 = client.BatchV1Api()
 # Request Model
 class CampaignRequest(BaseModel):
     name: str
-    schedule: str  # Example: "*/5 * * * *" (Every 5 minutes)
+    schedule: Optional[str] = "0 0 * * *"  # Default: daily at 12AM
+    target_api_url: str
+    payload: Optional[dict] = {}
+
 
 def create_cronjob(campaign: CampaignRequest):
     job_name = f"{campaign.name}-{uuid.uuid4().hex[:6]}"  # Unique job name
+
+    encoded_payload = base64.b64encode(json.dumps(campaign.payload).encode()).decode()
 
     cronjob = client.V1CronJob(
         metadata=client.V1ObjectMeta(name=job_name),
@@ -32,9 +39,18 @@ def create_cronjob(campaign: CampaignRequest):
                             restart_policy="Never",
                             containers=[
                                 client.V1Container(
-                                    name="test-container",
-                                    image="busybox",
-                                    command=["echo", f"Running test pod for campaign {campaign.name}"]
+                                    name="campaign-job",
+                                    image="curlimages/curl:latest",
+                                    command=[
+                                        "sh", "-c",
+                                        f'echo {encoded_payload} | base64 -d > /tmp/payload.json && '
+                                        f'curl -X POST -H "Content-Type: application/json" '
+                                        f'-H "x-api-key: $API_KEY" '
+                                        f'-d @/tmp/payload.json "{campaign.target_api_url}"'
+                                    ],
+                                    env=[
+                                        client.V1EnvVar(name="API_KEY", value=os.getenv("BACK_END_API_KEY", "changeme"))
+                                    ]
                                 )
                             ]
                         )
