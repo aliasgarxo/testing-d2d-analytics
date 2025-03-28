@@ -17,6 +17,19 @@ spec:
         image: dellhoak/campaign-controller:latest
         ports:
         - containerPort: 8000
+        env:
+        - name: BACK_END_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: backend-api-secret
+              key: BACK_END_API_KEY
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "350m"
 ---
 apiVersion: v1
 kind: Service
@@ -30,4 +43,3 @@ spec:
       port: 80
       targetPort: 8000
   type: ClusterIP
-
